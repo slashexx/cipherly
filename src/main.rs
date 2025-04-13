@@ -1,6 +1,10 @@
 use clap::{Parser, Subcommand};
 use thiserror::Error;
 
+mod ciphers;
+
+use ciphers::{CaesarCipher, VigenereCipher, PlayfairCipher, HillCipher};
+
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
@@ -39,6 +43,13 @@ enum Commands {
         #[arg(short, long)]
         key: String,
     },
+    
+    /// Brute force decrypt Caesar cipher using frequency analysis
+    BruteForce {
+        /// The text to decrypt
+        #[arg(short, long)]
+        text: String,
+    },
 }
 
 #[derive(Error, Debug)]
@@ -67,120 +78,32 @@ fn main() {
                 Err(e) => eprintln!("Error: {}", e),
             }
         }
+        Commands::BruteForce { text } => {
+            let results = CaesarCipher::brute_force(text);
+            println!("Possible decryptions (sorted by likelihood):");
+            for (shift, decrypted, chi_squared) in results {
+                println!("Shift {}: {} (chi-squared: {:.4})", shift, decrypted, chi_squared);
+            }
+        }
     }
 }
 
-fn encrypt(cipher: &str, text: &str, key: &str) -> Result<String, CipherError> {
+fn encrypt(cipher: &str, text: &str, key: &str) -> Result<String, String> {
     match cipher.to_lowercase().as_str() {
-        "caesar" => caesar_encrypt(text, key),
-        "vigenere" => vigenere_encrypt(text, key),
-        "playfair" => playfair_encrypt(text, key),
-        "hill" => hill_encrypt(text, key),
-        _ => Err(CipherError::InvalidCipher(cipher.to_string())),
+        "caesar" => CaesarCipher::encrypt(text, key),
+        "vigenere" => VigenereCipher::encrypt(text, key),
+        "playfair" => PlayfairCipher::encrypt(text, key),
+        "hill" => HillCipher::encrypt(text, key),
+        _ => Err(format!("Invalid cipher type: {}", cipher)),
     }
 }
 
-fn decrypt(cipher: &str, text: &str, key: &str) -> Result<String, CipherError> {
+fn decrypt(cipher: &str, text: &str, key: &str) -> Result<String, String> {
     match cipher.to_lowercase().as_str() {
-        "caesar" => caesar_decrypt(text, key),
-        "vigenere" => vigenere_decrypt(text, key),
-        "playfair" => playfair_decrypt(text, key),
-        "hill" => hill_decrypt(text, key),
-        _ => Err(CipherError::InvalidCipher(cipher.to_string())),
+        "caesar" => CaesarCipher::decrypt(text, key),
+        "vigenere" => VigenereCipher::decrypt(text, key),
+        "playfair" => PlayfairCipher::decrypt(text, key),
+        "hill" => HillCipher::decrypt(text, key),
+        _ => Err(format!("Invalid cipher type: {}", cipher)),
     }
-}
-
-// Caesar Cipher implementation
-fn caesar_encrypt(text: &str, key: &str) -> Result<String, CipherError> {
-    let shift: i32 = key.parse().map_err(|_| CipherError::InvalidKey(key.to_string()))?;
-    let shift = shift % 26;
-    
-    Ok(text
-        .chars()
-        .map(|c| {
-            if c.is_ascii_alphabetic() {
-                let base = if c.is_ascii_uppercase() { 'A' } else { 'a' };
-                let c = c as i32 - base as i32;
-                let shifted = (c + shift).rem_euclid(26);
-                (base as i32 + shifted) as u8 as char
-            } else {
-                c
-            }
-        })
-        .collect())
-}
-
-fn caesar_decrypt(text: &str, key: &str) -> Result<String, CipherError> {
-    let shift: i32 = key.parse().map_err(|_| CipherError::InvalidKey(key.to_string()))?;
-    caesar_encrypt(text, &(-shift).to_string())
-}
-
-// Vigenère Cipher implementation
-fn vigenere_encrypt(text: &str, key: &str) -> Result<String, CipherError> {
-    if !key.chars().all(|c| c.is_ascii_alphabetic()) {
-        return Err(CipherError::InvalidKey("Key must contain only letters".to_string()));
-    }
-    
-    let key = key.to_uppercase();
-    let key_chars: Vec<char> = key.chars().collect();
-    let mut key_index = 0;
-    
-    Ok(text
-        .chars()
-        .map(|c| {
-            if c.is_ascii_alphabetic() {
-                let base = if c.is_ascii_uppercase() { 'A' } else { 'a' };
-                let c = c as i32 - base as i32;
-                let k = key_chars[key_index % key_chars.len()] as i32 - 'A' as i32;
-                let shifted = (c + k).rem_euclid(26);
-                key_index += 1;
-                (base as i32 + shifted) as u8 as char
-            } else {
-                c
-            }
-        })
-        .collect())
-}
-
-fn vigenere_decrypt(text: &str, key: &str) -> Result<String, CipherError> {
-    if !key.chars().all(|c| c.is_ascii_alphabetic()) {
-        return Err(CipherError::InvalidKey("Key must contain only letters".to_string()));
-    }
-    
-    let key = key.to_uppercase();
-    let key_chars: Vec<char> = key.chars().collect();
-    let mut key_index = 0;
-    
-    Ok(text
-        .chars()
-        .map(|c| {
-            if c.is_ascii_alphabetic() {
-                let base = if c.is_ascii_uppercase() { 'A' } else { 'a' };
-                let c = c as i32 - base as i32;
-                let k = key_chars[key_index % key_chars.len()] as i32 - 'A' as i32;
-                let shifted = (c - k).rem_euclid(26);
-                key_index += 1;
-                (base as i32 + shifted) as u8 as char
-            } else {
-                c
-            }
-        })
-        .collect())
-}
-
-// Placeholder functions for Playfair and Hill ciphers
-fn playfair_encrypt(_text: &str, _key: &str) -> Result<String, CipherError> {
-    Err(CipherError::InvalidCipher("Playfair cipher not yet implemented".to_string()))
-}
-
-fn playfair_decrypt(_text: &str, _key: &str) -> Result<String, CipherError> {
-    Err(CipherError::InvalidCipher("Playfair cipher not yet implemented".to_string()))
-}
-
-fn hill_encrypt(_text: &str, _key: &str) -> Result<String, CipherError> {
-    Err(CipherError::InvalidCipher("Hill cipher not yet implemented".to_string()))
-}
-
-fn hill_decrypt(_text: &str, _key: &str) -> Result<String, CipherError> {
-    Err(CipherError::InvalidCipher("Hill cipher not yet implemented".to_string()))
 } 

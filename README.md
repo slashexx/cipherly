@@ -6,8 +6,8 @@ A command-line tool for encrypting and decrypting text using various classic cip
 
 - Caesar Cipher
 - Vigenère Cipher
-- Playfair Cipher (coming soon)
-- Hill Cipher (coming soon)
+- Playfair Cipher
+- Hill Cipher
 
 ## Installation
 
@@ -32,6 +32,11 @@ Decrypt:
 cargo run -- decrypt -c caesar -t "KHOOR ZRUOG" -k 3
 ```
 
+Brute Force Decrypt:
+```bash
+cargo run -- brute-force -t "KHOOR ZRUOG"
+```
+
 ### Vigenère Cipher
 
 Encrypt:
@@ -44,6 +49,30 @@ Decrypt:
 cargo run -- decrypt -c vigenere -t "RIJVS UYVJN" -k "KEY"
 ```
 
+### Playfair Cipher
+
+Encrypt:
+```bash
+cargo run -- encrypt -c playfair -t "HELLO WORLD" -k "KEYWORD"
+```
+
+Decrypt:
+```bash
+cargo run -- decrypt -c playfair -t "GDXXN QNKZU" -k "KEYWORD"
+```
+
+### Hill Cipher
+
+Encrypt:
+```bash
+cargo run -- encrypt -c hill -t "HELLO" -k "9 4 5 7"
+```
+
+Decrypt:
+```bash
+cargo run -- decrypt -c hill -t "ZNKYY" -k "9 4 5 7"
+```
+
 ## Command Line Arguments
 
 - `-c, --cipher`: The cipher to use (caesar, vigenere, playfair, hill)
@@ -51,8 +80,8 @@ cargo run -- decrypt -c vigenere -t "RIJVS UYVJN" -k "KEY"
 - `-k, --key`: The key for the cipher
   - For Caesar: A number (shift amount)
   - For Vigenère: A word or phrase
-  - For Playfair: A word or phrase (coming soon)
-  - For Hill: A matrix key (coming soon)
+  - For Playfair: A word or phrase
+  - For Hill: Space-separated numbers for the matrix (e.g., "9 4 5 7" for a 2x2 matrix)
 
 ## Examples
 
@@ -65,6 +94,10 @@ cargo run -- decrypt -c vigenere -t "RIJVS UYVJN" -k "KEY"
    # Decrypt
    cargo run -- decrypt -c caesar -t "KHOOR ZRUOG" -k 3
    # Output: HELLO WORLD
+
+   # Brute Force
+   cargo run -- brute-force -t "KHOOR ZRUOG"
+   # Output: Shows all possible shifts sorted by likelihood
    ```
 
 2. Vigenère Cipher with key "KEY":
@@ -78,9 +111,32 @@ cargo run -- decrypt -c vigenere -t "RIJVS UYVJN" -k "KEY"
    # Output: HELLO WORLD
    ```
 
-## Coming Soon
+3. Playfair Cipher with key "KEYWORD":
+   ```bash
+   # Encrypt
+   cargo run -- encrypt -c playfair -t "HELLO WORLD" -k "KEYWORD"
+   # Output: GDXXN QNKZU
 
-- Playfair Cipher implementation
-- Hill Cipher implementation
-- Brute force decryption for Caesar Cipher
-- Frequency analysis tools 
+   # Decrypt
+   cargo run -- decrypt -c playfair -t "GDXXN QNKZU" -k "KEYWORD"
+   # Output: HELLO WORLD
+   ```
+
+4. Hill Cipher with 2x2 matrix key:
+   ```bash
+   # Encrypt
+   cargo run -- encrypt -c hill -t "HELLO" -k "9 4 5 7"
+   # Output: ZNKYY
+
+   # Decrypt
+   cargo run -- decrypt -c hill -t "ZNKYY" -k "9 4 5 7"
+   # Output: HELLO
+   ```
+
+## Features
+
+- Caesar Cipher with brute force decryption using frequency analysis
+- Vigenère Cipher with keyword-based encryption/decryption
+- Playfair Cipher with 5x5 key square
+- Hill Cipher with 2x2 and 3x3 matrix support
+- Frequency analysis tools for cryptanalysis 
