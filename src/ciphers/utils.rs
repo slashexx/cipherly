@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-/// Convert a character to its position in the alphabet (0-25)
 pub fn char_to_index(c: char) -> i32 {
     if c.is_ascii_uppercase() {
         (c as i32) - ('A' as i32)
@@ -11,16 +10,14 @@ pub fn char_to_index(c: char) -> i32 {
     }
 }
 
-/// Convert an index (0-25) to a character
 pub fn index_to_char(index: i32, uppercase: bool) -> char {
     let base = if uppercase { 'A' } else { 'a' };
     ((base as i32) + (index.rem_euclid(26))) as u8 as char
 }
 
-/// Calculate frequency of each character in a string
 pub fn calculate_frequency(text: &str) -> HashMap<char, f64> {
     let mut freq = HashMap::new();
-    let mut total = 0;
+    let mut total = 0;no 
     
     for c in text.chars() {
         if c.is_ascii_alphabetic() {
@@ -29,7 +26,6 @@ pub fn calculate_frequency(text: &str) -> HashMap<char, f64> {
         }
     }
     
-    // Convert counts to frequencies
     if total > 0 {
         for (_, count) in freq.iter_mut() {
             *count /= total as f64;
@@ -39,7 +35,6 @@ pub fn calculate_frequency(text: &str) -> HashMap<char, f64> {
     freq
 }
 
-/// Standard English letter frequencies
 pub const ENGLISH_FREQUENCIES: [(char, f64); 26] = [
     ('E', 0.12702), ('T', 0.09056), ('A', 0.08167), ('O', 0.07507),
     ('I', 0.06966), ('N', 0.06749), ('S', 0.06327), ('H', 0.06094),
@@ -50,7 +45,6 @@ pub const ENGLISH_FREQUENCIES: [(char, f64); 26] = [
     ('Q', 0.00095), ('Z', 0.00074),
 ];
 
-/// Calculate chi-squared statistic for frequency analysis
 pub fn chi_squared(freq: &HashMap<char, f64>) -> f64 {
     let mut chi_squared = 0.0;
     
@@ -61,4 +55,4 @@ pub fn chi_squared(freq: &HashMap<char, f64>) -> f64 {
     }
     
     chi_squared
-} 
+}

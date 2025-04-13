@@ -9,7 +9,6 @@ impl PlayfairCipher {
         let mut used = HashMap::new();
         let key = key.to_uppercase().replace('J', "I");
         
-        // Initialize the key square
         for i in 0..5 {
             key_square.push(Vec::with_capacity(5));
             for j in 0..5 {
@@ -17,7 +16,6 @@ impl PlayfairCipher {
             }
         }
         
-        // Fill with key
         let mut row = 0;
         let mut col = 0;
         
@@ -33,7 +31,6 @@ impl PlayfairCipher {
             }
         }
         
-        // Fill remaining spaces with unused letters
         for c in 'A'..='Z' {
             if c != 'J' && !used.contains_key(&c) {
                 used.insert(c, true);
@@ -57,7 +54,7 @@ impl PlayfairCipher {
                 }
             }
         }
-        (0, 0) // Should never happen
+        (0, 0)
     }
     
     fn prepare_text(text: &str) -> String {
@@ -100,17 +97,14 @@ impl PlayfairCipher {
             let (row2, col2) = Self::find_position(&key_square, c2);
             
             let (new_c1, new_c2) = if row1 == row2 {
-                // Same row
                 let new_col1 = (col1 + 1) % 5;
                 let new_col2 = (col2 + 1) % 5;
                 (key_square[row1][new_col1], key_square[row2][new_col2])
             } else if col1 == col2 {
-                // Same column
                 let new_row1 = (row1 + 1) % 5;
                 let new_row2 = (row2 + 1) % 5;
                 (key_square[new_row1][col1], key_square[new_row2][col2])
             } else {
-                // Rectangle
                 (key_square[row1][col2], key_square[row2][col1])
             };
             
@@ -135,17 +129,14 @@ impl PlayfairCipher {
             let (row2, col2) = Self::find_position(&key_square, c2);
             
             let (new_c1, new_c2) = if row1 == row2 {
-                // Same row
                 let new_col1 = (col1 + 4) % 5;
                 let new_col2 = (col2 + 4) % 5;
                 (key_square[row1][new_col1], key_square[row2][new_col2])
             } else if col1 == col2 {
-                // Same column
                 let new_row1 = (row1 + 4) % 5;
                 let new_row2 = (row2 + 4) % 5;
                 (key_square[new_row1][col1], key_square[new_row2][col2])
             } else {
-                // Rectangle
                 (key_square[row1][col2], key_square[row2][col1])
             };
             
@@ -154,7 +145,6 @@ impl PlayfairCipher {
             i += 2;
         }
         
-        // Remove padding X's
         let mut final_result = String::new();
         let mut i = 0;
         while i < result.len() {
@@ -168,7 +158,6 @@ impl PlayfairCipher {
             }
         }
         
-        // Remove trailing X if present
         if final_result.ends_with('X') {
             final_result.pop();
         }

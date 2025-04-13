@@ -40,7 +40,6 @@ impl CaesarCipher {
             results.push((shift, decrypted, chi_squared));
         }
         
-        // Sort by chi-squared (lower is better match to English frequencies)
         results.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap());
         results
     }

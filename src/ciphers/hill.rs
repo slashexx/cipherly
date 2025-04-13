@@ -62,7 +62,6 @@ impl HillCipher {
         let n = matrix.len();
         let mut det = 0;
         
-        // Calculate determinant
         if n == 2 {
             det = (matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]) % 26;
         } else if n == 3 {
@@ -85,7 +84,6 @@ impl HillCipher {
             inverse[1][0] = (-matrix[1][0] * det_inv) % 26;
             inverse[1][1] = (matrix[0][0] * det_inv) % 26;
         } else if n == 3 {
-            // For 3x3 matrix, calculate cofactors and adjugate
             for i in 0..3 {
                 for j in 0..3 {
                     let mut cofactor = Vec::new();
@@ -108,7 +106,6 @@ impl HillCipher {
             }
         }
         
-        // Ensure all values are positive
         for i in 0..n {
             for j in 0..n {
                 inverse[i][j] = (inverse[i][j] + 26) % 26;
@@ -129,7 +126,6 @@ impl HillCipher {
         while i < text.len() {
             let mut vector = Vec::with_capacity(n);
             
-            // Fill vector with text characters
             for j in 0..n {
                 if i + j < text.len() {
                     let c = text.chars().nth(i + j).unwrap();
@@ -139,15 +135,12 @@ impl HillCipher {
                         return Err("Text must contain only letters".to_string());
                     }
                 } else {
-                    // Pad with 'X' if needed
-                    vector.push(23); // 'X' is at index 23
+                    vector.push(23);
                 }
             }
             
-            // Multiply matrix with vector
             let encrypted = Self::matrix_multiply(&matrix, &vector);
             
-            // Convert back to letters
             for &num in &encrypted {
                 result.push(index_to_char(num, true));
             }
@@ -170,7 +163,6 @@ impl HillCipher {
         while i < text.len() {
             let mut vector = Vec::with_capacity(n);
             
-            // Fill vector with text characters
             for j in 0..n {
                 if i + j < text.len() {
                     let c = text.chars().nth(i + j).unwrap();
@@ -184,10 +176,8 @@ impl HillCipher {
                 }
             }
             
-            // Multiply inverse matrix with vector
             let decrypted = Self::matrix_multiply(&inverse, &vector);
             
-            // Convert back to letters
             for &num in &decrypted {
                 result.push(index_to_char(num, true));
             }

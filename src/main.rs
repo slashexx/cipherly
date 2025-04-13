@@ -14,39 +14,32 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Encrypt text using a specified cipher
+    #[arg(short, long)]
     Encrypt {
-        /// The cipher to use (caesar, vigenere, playfair, hill)
         #[arg(short, long)]
         cipher: String,
         
-        /// The text to encrypt
         #[arg(short, long)]
         text: String,
         
-        /// The key for the cipher
         #[arg(short, long)]
         key: String,
     },
     
-    /// Decrypt text using a specified cipher
+    #[arg(short, long)]
     Decrypt {
-        /// The cipher to use (caesar, vigenere, playfair, hill)
         #[arg(short, long)]
         cipher: String,
         
-        /// The text to decrypt
         #[arg(short, long)]
         text: String,
         
-        /// The key for the cipher
         #[arg(short, long)]
         key: String,
     },
     
-    /// Brute force decrypt Caesar cipher using frequency analysis
+    #[arg(short, long)]
     BruteForce {
-        /// The text to decrypt
         #[arg(short, long)]
         text: String,
     },
